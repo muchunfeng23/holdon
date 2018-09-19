@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="author" content="" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <script type="text/javascript" src="/assets/js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/assets/js/select2.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap-table-zh-CN.min.js"></script>
+    <script type="text/javascript" src="/assets/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/assets/js/laydate/laydate.js"></script>
+    <script type="text/javascript" src="/assets/js/mrm/common.js"></script>
+    <script type="text/javascript" src="/assets/js/mrm/fileupload.js"></script>
+    <script type="text/javascript" src="/assets/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.webui-popover.min.js"></script>
+    <script type="text/javascript" src="/assets/js/only-run-java.js"></script>
+	
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-table.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/select2.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/viewer.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/jquery.webui-popover.min.css"/>
+    
+<title></title>
+<style type="text/css">
+	.mc-form-group .btn {width: inherit;margin-left:0}
+	.control-label{text-align:right !important;}
+</style>
+
+</head>
+
+<body>
+
+	<div th:replace="include/common"></div>
+	<div class="wrap">
+		<div class="main">
+			<!-- <div class="form-group mc-form-group">
+				<label class="control-label">竟对商品搜索</label>
+			</div> -->
+			<!-- 搜索区域 -->
+			<section>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form role="form" id="search_form" class="form">
+							<div class="form-group mc-form-group">
+								<label class="control-label">城市:</label>
+								<select class="form-control" id="select-city" name="select-city"></select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">竞品名称:</label>
+								<input id="goods-name" type="text" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label" style="margin-left:-15px !important;">平台:</label>
+								<select id="select-sourse" name="select-sourse" class="form-control">
+									<option selected="selected" value="">全部</option>
+									<option value="kuailv">快驴</option>
+								</select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label" style="margin-left:-15px !important;">商户:</label>
+								<select id="select-business" name="select-business" class="form-control">
+								</select>
+							</div>
+							
+							<div class="form-group mc-form-group">
+								<label class="control-label" style="margin-left:-15px !important;">一级分类:</label>
+								<select id="select-class1" name="select-class1" class="form-control">
+								</select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label" style="margin-left:-15px !important;">二级分类:</label>
+								<select id="select-class2" name="select-class2" class="form-control">
+								</select>
+							</div>
+							
+							<div class="form-group mc-form-group">
+								<label class="control-label" style="margin-left:-15px !important;">是否绑定:</label>
+								<select id="is-band" name="select-sourse" class="form-control">
+									<option selected="selected" value="-1">全部</option>
+									<option value="0">未绑定</option>
+									<option value="1">绑定</option>									
+								</select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">竞品ID:</label>
+								<input id="goods-id" type="text" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">单位:</label>
+								<input id="goods-unit" type="text" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label" style="margin-left:-15px !important;">是否新品:</label>
+								<select id="is-new" name="select-sourse" class="form-control">
+									<option selected="selected" value="0">全部</option>
+									<option value="1">新品</option>
+									<option value="2">非新品</option>									
+								</select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label" style="margin-left:-15px !important;">是否涨价:</label>
+								<select id="is-priceChange" name="select-sourse" class="form-control">
+									<option selected="selected" value="0">全部</option>
+									<option value="1">涨价</option>
+									<option value="2">降价</option>	
+									<option value="3">持平</option>								
+								</select>
+							</div>
+							<div class="form-group mc-form-group" style="">
+	                            <label class="control-label" style="text-align:right">爬取日期:</label>
+	                            <input id="start_date" type="text" class="form-control" name="start_date" onclick="laydate()" placeholder="开始日期" autocomplete="off" readonly style="background-color:#fff">
+	                            <label class="control-label" style="text-align: center !important;">至</label>
+	                            <input id="end_date" type="text" class="form-control" name="end_date" onclick="laydate()" placeholder="结束日期" autocomplete="off" readonly style="background-color:#fff">
+	                        </div>
+	                        <div class="form-group mc-form-group">
+	                        	<label class="control-label">商品描述:</label>
+	                        	<input id="goods-description" type="text" class="form-control" />
+	                        </div>
+	                        <div class="form-group mc-form-group">
+	                            <button id="searchIndex" type="button" class="btn btn-sch btn-primary">查询</button>
+	                        </div>
+	                        <div class="form-group mc-form-group">	                       
+	                            <button id="downloadIndex" type="button" class="btn btn-sch btn-primary">导出</button>
+	                        </div>
+						</form>
+					</div>
+				</div>
+			</section>
+			<!-- table -->
+			<section>
+				<table id="tableIndex" data-toolbar="#toolbar"></table>
+			</section>
+			
+			<form action="/research/crawlercommodity/download" method="post" id="download" class="hidden">
+			    <input type="text" name="selectCity">
+			    <input type="text" name="goodsName">
+			    <input type="text" name="selectSourse">
+			    <input type="text" name="isBand">
+			    <input type="text" name="goodsId">
+			    <input type="text" name="goodsUnit">
+			    <input type="text" name="endDateStr">
+			    <input type="text" name="startDateStr">
+			    <input type="text" name="goodsDescription">
+			    <input type="text" name="class1Name">
+			    <input type="text" name="class2Name">
+			    <input type="text" name="isNew">
+			    <input type="text" name="isPriceChange">
+			</form>    
+			
+		</div>
+	</div>
+</body>
+
+<!-- Modal Set Start -->
+<div th:replace="crawler/commodityinfo"></div>
+<!-- Modal Set End -->
+
+<script th:inline="javascript">
+
+	$(function () {
+	
+	    window.addEventListener('message', function (e) {
+	        if (e.data.middle)
+	            $('nav').hide();
+	        if (e.data.header_city_id) {
+	            $('#header_city_id').val(e.data.header_city_id);
+	            $(document).trigger('cityIdGot');
+	        }
+	    })
+	});
+	
+	$(function(){
+	    laydate($.extend({},defaultDateOpts,{elem: '#start_date',max:laydate.now(0)}));
+	    laydate($.extend({},defaultDateOpts,{elem: '#end_date',max:laydate.now(0)}));
+	
+	    startDate.val(laydate.now(0));
+	    endDate.val(laydate.now(0));
+	
+	    tableIndex.bootstrapTable({columns:arrColumns});
+        business();
+        
+        $.ajax({
+            method : 'post',
+            url :'/research/crawlercommodity/getCrawlerCities',
+            contentType : 'application/json',
+            data : {},
+            dataType : 'json',
+            success : function(json) {
+            	//alert("json="+JSON.stringify(json));
+                var option = '';
+                if (json.error_code == 0 && json.data) {
+                    for (var i = 0, len = json.data.length; i < len; i++) {
+                        option += '<option value="'+json.data[i].cityId+'">'
+                            + json.data[i].cityName + '</option>';
+                    }
+                }
+                $("#select-city").html(option).trigger('change');
+            }
+        })
+        
+	});
+
+    function business() {
+        $.ajax({
+            method : 'post',
+            url :'/research/crawlercommodity/getBusiness',
+            contentType : 'application/json',
+            data : {},
+            dataType : 'json',
+            success : function(json) {
+                var option = '<option selected="selected" value="">全部</option>';
+                var data = json.data;
+                if (json.error_code == 0 && json.data) {
+                    for (var i = 0, len = data.rows.length; i < len; i++) {
+                        option += '<option value="'+data.rows[i].businessId+'">'
+                            + data.rows[i].businessNum + '</option>';
+                    }
+                }
+                $("#select-business").html(option).trigger('change');
+            }
+        })
+    }
+
+	var defaultDateOpts = {elem: '#id', format: 'YYYY-MM-DD', isclear: true, issure: true};
+	var tableIndex = $("#tableIndex");
+	var searchIndex = $("#searchIndex");
+	var downloadIndex =$("#downloadIndex");
+	var startDate = $("#start_date");
+	var endDate = $("#end_date");
+    var profitInfo = $("#modal-profit-info");
+	var arrColumns=[
+			{
+			    title: '爬虫商品ID',
+			    align: 'center',
+		    	formatter: function(v,row){
+                    return `<a class="profit-info-view" data-info="${row.id}" target="_blank" style="cursor:pointer">${row.id}</a>`
+	            }
+			},
+			{
+			    field: 'name',
+			    title: '商品名称',
+			    align: 'center'
+			},
+			{
+			    field: 'class1Name',
+			    title: '一级类别',
+			    align: 'center'
+			},
+			{
+			    field: 'class2Name',
+			    title: '二级类别',
+			    align: 'center'
+			},
+			{
+			    field: 'businessId',
+			    title: '商户',
+			    align: 'center'
+			},
+			{
+			    field: 'description',
+			    title: '商品描述',
+			    align: 'center'
+			},
+			{
+			    title: '上次价格',
+			    align: 'center',
+		    	formatter: function(v,row){
+			    	return `<lable>${row.lastPrice / 1000}</lable>`
+			    }
+			},
+			{
+			    title: '价格',
+			    align: 'center',
+			    formatter: function(v,row){
+			    	return `<lable style="color:#FF0000;font-weight:bold" >${row.price}</lable>`
+			    }
+			},
+			{
+				field: 'originalPrice',
+			    title: '原价',
+			    align: 'center'
+			},
+			{
+			    field: 'unit',
+			    title: '单位',
+			    align: 'center'
+			},
+			{
+				field: 'format',
+			    title: '规格',
+			    align: 'center'
+			},
+			{
+			    title: '标签',
+			    formatter: function(v,row){
+			    	if(row.promoteTag == "原价"){
+			    		return `<lable>${row.promoteTag}</lable>`
+			    	}
+			    	return `<lable style="color:#FF0000;font-weight:bold" >${row.promoteTag}</lable>`
+			    }
+			},
+			{
+			    field: 'source',
+			    title: '来源平台',
+			    align: 'center'
+			},
+			{
+			    field: 'cityName',
+			    title: '城市',
+			    align: 'center'
+			},
+			{
+			    field: 'dt',
+			    title: '爬取时间',
+			    align: 'center'
+			},
+			{
+			    
+			    title: '网址',
+			    align: 'center',
+		    	formatter: function(v,row){
+		    		if(row.pictureUrl==''){
+		    			return `来源网页`
+		    		}
+	                return `<a class="profit-info-view1" href="${row.pictureUrl}" target="_blank">来源网页</a>`
+	            }
+			}];
+	
+	searchIndex.on('click',function(){initPage()});
+	
+	downloadIndex.on('click',function(){
+		if(new Date($("#start_date").val()) > new Date($("#end_date").val())){
+            layer.msg('时间区间不正确');
+            return;
+        }
+        var goodsId=$("#goods-id").val();
+        if(isNaN(goodsId)){
+        	layer.msg('请输入正确的竞品ID');
+        	return;
+        }
+        var data={};
+        $("input[name='selectCity']").val($("#select-city").val());
+        
+        $("input[name='goodsName']").val($("#goods-name").val());
+
+        $("input[name='selectSourse']").val($("#select-sourse").val());
+
+        $("input[name='isBand']").val($("#is-band").val() == -1 ? '' : $("#is-band").val());
+
+        $("input[name='goodsId']").val( $("#goods-id").val());
+
+        $("input[name='goodsUnit']").val($("#goods-unit").val());
+
+        $("input[name='endDateStr']").val( endDate.val());
+
+        $("input[name='startDateStr']").val(startDate.val());
+
+        $("input[name='goodsDescription']").val($("#goods-description").val());
+        
+        $("input[name='class1Name']").val($("#select-class1").val());
+        $("input[name='class2Name']").val($("#select-class2").val());
+        
+        $("input[name='isNew']").val($("#is-new").val());
+        $("input[name='isPriceChange']").val($("#is-priceChange").val());
+        
+        $("#download").submit();
+        
+        /* $.ajax({
+            dataType: "JSON",
+    		contentType:'application/json;charset=UTF-8',//关键是要加上这行
+    		traditional:true,//这使json格式的字符不会被转码
+    		method:'post',
+            url:'/research/crawlercommodity/download',
+            data:JSON.stringify(data),
+            beforeSend:function(jqXHR,settings){
+
+			},
+            success:function(json){
+            	window.location.href="export.xls";
+            },
+            error:function(){
+            	window.location.href="export.xls";
+            }
+        }); */
+	})
+	
+    function initPage(obj){
+        if(new Date($("#start_date").val()) > new Date($("#end_date").val())){
+            layer.msg('时间区间不正确');
+            return;
+        }
+        var goodsId=$("#goods-id").val();
+        if(isNaN(goodsId)){
+        	layer.msg('请输入正确的竞品ID');
+        	return;
+        }
+        tableIndex.bootstrapTable('destroy').bootstrapTable({
+            columns:arrColumns,
+            showRefresh:true,
+            uniqueId:'id',
+            url:'/research/crawlercommodity/getCrawlerCommodityByParamsInPage',
+            queryParamsType:'',
+            pagination:true,
+            sidePagination: 'server',
+            method:'post',
+            pageSize:40,
+            pageList: [20,40,60,80],
+            paginationPreText: "上一页",
+            paginationNextText: "下一页",
+            paginationFirstText: "首页",
+            paginationLastText: "尾页",
+            queryParams:function (params) {
+                params.selectCity = $("#select-city").val();
+                params.goodsName = $("#goods-name").val();
+                params.selectSourse = $("#select-sourse").val();
+                params.isBand = $("#is-band").val() == -1 ? null : $("#is-band").val();
+                params.isNew = $("#is-new").val() == -1 ? null : $("#is-new").val();
+                params.isPriceChange = $("#is-priceChange").val() == -1 ? null : $("#is-priceChange").val();
+                params.goodsId = $("#goods-id").val();
+                params.goodsUnit = $("#goods-unit").val();
+                params.endDateStr = endDate.val();
+                params.startDateStr = startDate.val();
+                params.goodsDescription = $("#goods-description").val();
+                params.businessId = $("#select-business").val();
+                params.class1Name = $("#select-class1").val();
+                params.class2Name = $("#select-class2").val();
+                return params;
+            },
+            responseHandler:function(res){
+            	if(res.data){
+                    return res.data
+                }else{
+                    return [];
+                }
+            }
+        });
+        
+    }
+
+    tableIndex.on('click', '.profit-info-view', function(){
+        var dataInfo = $(this).data('info');
+		
+        $("#goodsId").val(dataInfo);
+        startDate1.val(laydate.now(-6));
+        endDate1.val(laydate.now(0));
+		
+        modalTable1.bootstrapTable('destroy').bootstrapTable({
+            columns:arrColumns1,
+            showRefresh:false,
+            uniqueId:'id',
+            url:'/research/crawlercommodityinfo/getCommodityInfoById',
+            queryParamsType:'',
+            pagination:false,
+            sidePagination: 'server',
+            method:'post',
+            queryParams:function (params) {
+                params.goodsId = $("#goodsId").val();
+                params.selectCity = $("#select-city").val();
+                return params;
+			},
+            responseHandler:function(res){
+                if(res.data){
+                    profitInfo.modal('show');
+                    initPageChart();
+                    return res.data;
+                }else{
+
+                    return [];
+                }
+            }
+        });
+    });
+
+    function initPageChart(dataInfo){
+        if(new Date($("#start_date1").val()) > new Date($("#end_date1").val())){
+            layer.msg('时间区间不正确');
+            return;
+        }
+
+        modalTable2.bootstrapTable('destroy').bootstrapTable({
+            columns:arrColumns2,
+            showRefresh:false,
+            uniqueId:'id',
+            url:'/research/crawlercommodityinfo/getCommodityPriceByParamsInPage',
+            queryParamsType:'',
+            pagination:true,
+            sidePagination: 'server',
+            method:'post',
+            dataType:'json',
+            pageSize:21,
+            pageList: [21,30,40],
+            paginationPreText: "上一页",
+            paginationNextText: "下一页",
+            paginationFirstText: "首页",
+            paginationLastText: "尾页",
+            queryParams:function (params) {
+                params.goodsId = $("#goodsId").val();
+                params.selectCity = $("#select-city").val();
+                params.endDateStr = endDate1.val();
+                params.startDateStr = startDate1.val();
+                return params;
+            },
+            responseHandler:function(res){
+                if(res.data){
+                    initChart(res);
+                    return res.data;
+                }else{
+                    return [];
+                }
+            }
+        });
+    }
+
+    function initChart(json){
+        var option;
+        var myChart = echarts.init(document.getElementById('charts'));
+        console.log(myChart);
+        if(json.error_code != 0){
+            myChart.setOption({});
+            return;
+        }
+        json = formatJSON(json);
+        console.log(json);
+
+        option = {
+            title: {
+                text: '价格'
+            },
+            tooltip : {
+                trigger: 'axis'
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                },
+                orient: 'vertical',
+                top: 60,
+                right: '2%'
+            },
+            grid: {
+                left: '3%',
+                right: '5%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    name : '日期',
+                    boundaryGap : false,
+                    axisLabel:{
+                        show:true,
+                        interval:0,
+                        rotate:-32,
+                        margin:9
+                    },
+                    data : json.date
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    name : '价格',
+                }
+            ],
+            series : [{
+                type: 'line',
+                name: '价格',
+                data: json.data
+			}]
+        };
+
+        myChart.setOption(option);
+        console.log(option);
+        profitInfo.on('shown.bs.modal',function(){
+            myChart.resize()
+        })
+    }
+
+    function formatJSON(json){
+        var obj = {date:[],data:[]};
+        var jsons=json.data.rows;
+        if(jsons.length==0){
+            for(var i=-6;i<=0;i++){
+                obj.date.push(laydate.now(i));
+                //obj.data.push(0);
+            }
+
+        }
+        for(var i=jsons.length-1;i>=0;i--){
+            obj.date.push(jsons[i].datekey);
+            obj.data.push(jsons[i].price);
+        }
+
+        return obj;
+    }
+    
+    $(function(){
+    	var class12Map = [[${allClassMap}]];
+    	//var tst = [[${test}]];
+    	var option = '<option selected="selected" value="全部">全部</option>';
+    	var selectedCity = $("#select-city").val()
+    	if(selectedCity !== null){
+	        for(var key in class12Map[selectedCity]){
+	        	option += '<option value="'+ key +'">' + key + '</option>';
+	        }
+    	}
+        $("#select-class1").html(option);
+        var optionClass2 = '<option selected="selected" value="全部">全部</option>';
+        $("#select-class2").html(optionClass2);
+        
+        
+        $("#select-city").change(function(){
+        	var selectedCity = $(this).val();
+        	fullFillClass1(selectedCity);
+        	fullFillClass2(selectedCity,null);
+        });
+        
+        
+        function fullFillClass1(aCity){
+        	var optionClass1All = '<option selected="selected" value="全部">全部</option>';
+        	if(aCity == null){
+        		$("#select-class1").html(option);
+        		return;
+        	}
+        	var selectedCity = aCity;
+       		for(var key in class12Map[selectedCity]){
+       			optionClass1All += '<option value="'+ key +'">' + key + '</option>';
+   	        }
+       		$("#select-class1").html(optionClass1All);
+        }
+        
+        function fullFillClass2(aCity,class1Name){
+        	var optionClass2All = '<option selected="selected" value="全部">全部</option>';
+        	if(aCity == null || class1Name == null || class1Name == "全部"){
+        		$("#select-class2").html(optionClass2All).trigger('change');
+        		return;
+        	}
+        	for(var indexkey = 0; indexkey < class12Map[aCity][class1Name].length;indexkey++){
+        		optionClass2All += '<option value="'+ class12Map[aCity][class1Name][indexkey] +'">' + class12Map[aCity][class1Name][indexkey] + '</option>';
+   	        }
+        	$("#select-class2").html(optionClass2All);
+        }
+        
+        $("#select-class1").change(function(){
+        	fullFillClass2($("#select-city").val(),$("#select-class1").val());
+        });
+    })
+</script>
+</html>

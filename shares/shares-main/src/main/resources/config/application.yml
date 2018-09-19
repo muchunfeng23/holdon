@@ -1,0 +1,12 @@
+server:
+  port: 11115
+
+application:
+  name: shares
+  
+logging:
+  path: /data/service/logs
+  config: classpath:config/logback.xml
+  level:
+    root: info
+    ACCESS: info

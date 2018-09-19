@@ -1,0 +1,12 @@
+<script th:inline="text">
+	var errorCode = "[[${errorCode}]]";
+</script>
+
+<script type="text/javascript">
+  postMsg({
+      errObj: {
+          error_code: errorCode,
+          error: {msg: '没有登录'}
+      }
+  });
+</script>

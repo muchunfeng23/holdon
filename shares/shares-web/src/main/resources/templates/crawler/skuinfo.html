@@ -1,0 +1,105 @@
+<div th:replace="include/common"></div>
+<div class="modal fade" id="modal-profit-info" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" style="width: 1000px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 id="modalTitle" class="modal-title">SKU信息详情</h4>
+			</div>
+			<div class="modal-body">
+				<!-- SKU索引 -->
+				<section>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">SKU索引</h3>
+						</div>
+
+						<div class="panel-body">
+							<div class="form-group mc-form-group">
+								<label class="control-label">SKU_ID:</label>
+								<input id="skuId1" type="text" readonly="readonly" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">产品名称:</label>
+								<input id="sku_name" type="text" readonly="readonly" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">国际码:</label>
+								<input id="international_code" readonly="readonly" type="text" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">状态:</label>
+								<input id="status" type="text" readonly="readonly" class="form-control" />
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- 分类属性 -->
+				<section>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">分类属性</h3>
+						</div>
+
+						<div class="panel-body">
+							<div class="form-group mc-form-group">
+								<label class="control-label">一级分类:</label>
+								<input id="class1-1" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">二级分类:</label>
+								<input id="class2-1" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">三级分类:</label>
+								<input id="class3" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">通用名:</label>
+								<input id="article_name" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">SBU编码:</label>
+								<input id="sbu_code" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">SBU名称:</label>
+								<input id="sbu_name" type="text" class="form-control" readonly="readonly"/>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!-- 生产属性 -->
+				<section>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">生产属性</h3>
+						</div>
+
+						<div class="panel-body">
+							<div class="form-group mc-form-group">
+								<label class="control-label">品牌:</label>
+								<input id="own_brand" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">生产厂商:</label>
+								<input id="manufacturer" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">产地国:</label>
+								<input id="origin_country_name" type="text" class="form-control" readonly="readonly"/>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">产区:</label>
+								<input id="origin_region" type="text" class="form-control" readonly="readonly"/>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default modal-btn-close" data-dismiss="modal" aria-label="Close">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>

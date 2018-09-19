@@ -1,0 +1,10 @@
+<input id="header_city_id" type="hidden" value=""/>
+<div style="border-top: none;"></div>
+
+<div id="user-id" class="hide"><p th:text="${user.id}" /></div>
+<div id="user-name" class="hide"><p th:text="${user.name}" /></div>
+
+<script type="text/javascript" src=" https://img-oss.yunshanmeicai.com/weixin/mall/cdn/ticker/punch.min.1.0.1.js"></script>
+<script type="text/javascript">
+	__punch.to($("#user-name").text() + '-' + $("#user-id").text());
+</script>

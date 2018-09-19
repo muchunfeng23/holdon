@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<dubbo:reference id="researchMarketSkuConfigApi"
+		interface="com.sprucetec.price.research.market.api.ResearchMarketSkuConfigApi"
+		group="priceResearchSkuConfig2"
+		check="false" timeout="20000" retries="0" />
+
+	<dubbo:reference id="researchMarketClassConfigApi"
+		interface="com.sprucetec.price.research.market.api.ResearchMarketClassConfigApi"
+		group="priceResearchClassConfig2"
+		check="false" timeout="20000" retries="0" />
+
+	<dubbo:reference id="researchMarketBaseConfigApi"
+		interface="com.sprucetec.price.research.market.api.ResearchMarketBaseConfigApi"
+		group="priceResearchMarketBaseConfig2"
+		check="false" timeout="20000" retries="0" />
+
+	<dubbo:reference id="researchMarketTaskApi"
+		interface="com.sprucetec.price.research.market.api.ResearchMarketTaskApi"
+		group="priceResearchMarketTask2"
+		check="false" timeout="20000" retries="0" />
+
+	<dubbo:reference id="researchMarketTaskRecordApi"
+		interface="com.sprucetec.price.research.market.api.ResearchMarketTaskRecordApi"
+		group="priceResearchMarketTaskRecord2"
+		check="false" timeout="20000" retries="0" />
+		
+	<dubbo:reference id="crawlerCommodityApi"
+		interface="com.sprucetec.price.research.crawler.api.CrawlerCommodityApi"
+		group="priceResearchCrawlerCommodity2"
+		check="false" timeout="20000" retries="0" />
+		
+	<dubbo:reference id="crawlerCommodityInfoApi"
+		interface="com.sprucetec.price.research.crawler.api.CrawlerCommodityInfoApi"
+		group="priceResearchCommodityInfo2"
+		check="false" timeout="20000" retries="0" />
+		
+	<dubbo:reference id="crawlerOperationApi"
+		interface="com.sprucetec.price.research.crawler.api.CrawlerOperationApi"
+		group="priceResearchOperationInfo2"
+		check="false" timeout="20000" retries="0" />
+		
+	<dubbo:reference id="crawlerMatchingApi"
+		interface="com.sprucetec.price.research.crawler.api.CrawlerMatchingApi"
+		group="priceResearchMatchingInfo2"
+		check="false" timeout="20000" retries="0" />
+		
+	<dubbo:reference id="crawlerCompareApi"
+		interface="com.sprucetec.price.research.crawler.api.CrawlerCompareApi"
+		group="priceResearchCompareInfo2"
+		check="false" timeout="20000" retries="0" />
+
+</beans>

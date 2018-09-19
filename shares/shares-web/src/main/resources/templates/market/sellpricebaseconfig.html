@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="include/head"></head>
+<body>
+	<div th:replace="include/common"></div>
+
+	<style media="screen">
+.opts {
+	margin: 0 6px;
+	cursor: pointer;
+}
+
+.opts_disagree {
+	color: red
+}
+
+.btn-sch {
+	background-color: #4ec7ff;
+	color: #fff
+}
+
+.apart {
+	background: rgba(129, 214, 247, 0.12)
+}
+
+.form-group .control-label {
+	text-align: right;
+}
+
+.form-group.mc-form-group .input-group {
+	width: 90px !important;
+}
+
+.input80 {
+	width: 80px !important;
+	z-index: 0 !important;
+}
+
+.mc-form-group .btn {
+	width: inherit;
+	margin-left: 0
+}
+
+.row {
+	display: flex;
+	align-items: center;
+}
+
+<
+style media ="screen ">.opts {
+	margin: 0 6px;
+	cursor: pointer;
+}
+
+.opts_disagree {
+	color: red
+}
+
+.btn-sch {
+	background-color: #4ec7ff;
+	color: #fff
+}
+
+.ssuinfo {
+	color: rgb(0, 102, 255)
+}
+
+.outer-table .pop-table {
+	position: fixed;
+	display: none
+}
+
+.pop-table {
+	margin-bottom: 3px !important
+}
+
+.pop-table tr td:nth-of-type(odd) {
+	background-color: #f3f2f2;
+	color: #000;
+}
+
+.mc-form-group .btn {
+	width: inherit;
+	margin-left: 0
+}
+
+<
+style>.category {
+	margin-right: 20px;
+	width: 200px !important;
+}
+
+input[readonly] {
+	background: #fff !important;
+	width: 144px !important;
+}
+
+select.form-control {
+	width: 120px !important;
+}
+
+.detail-view thead {
+	background: #e8e8e8;
+}
+
+.form .form-group, .form .checkbox-inline {
+	margin: 0 0 20px 20px;
+}
+</style>
+	<div class="wrap">
+		<div class="main">
+			<section id="ui-search-area">
+				<div class="panel panel-default">
+				
+					<div class="panel-body">
+						<form role="form" class="form form-inline">
+							<div class="form-group type type-class">
+							 <label class="control-label">市场名称</label>
+							 <input
+									type="text" class="form-control" id="market_name_percent"
+									placeholder="请输入市场名称">
+								
+							</div>
+
+							<div class="form-group">
+								<button id="search-index" type="button" class="btn btn-info"
+									style="margin-left: 20px">新增售价市调市场</button>
+								<!--   <button id="export-index" type="button" class="btn btn-success">导出</button>  -->
+							</div>
+						</form>
+					</div>
+				</div>
+			</section>
+			<!-- table -->
+			<section>
+				<table id="table-index"></table>
+			</section>
+		</div>
+	</div>
+
+
+	<script type="text/javascript">
+(function(){
+    var tableIndex = $("#table-index");
+    var searchIndex = $("#search-index");
+    var searchType = $("#select-search-type");
+    var profitInfo = $("#modal-profit-info");
+    var columns = [
+        {
+            field: 'name',
+            title: '市场名称',
+            align: 'center'
+        }, {
+            field: 'cityName',
+            title: '所在城市',
+            align: 'center'
+        }, {
+            title: '操作',
+            align: 'center',
+            formatter: function (value, row) {
+                var html = "<a class='js_delete'  href='javascript:void(0)' title='删除'>删除</a>";             
+                
+                html += "<input type='hidden' class='row' value='"+JSON.stringify(row)+"'>";
+              
+                return html;
+            }
+        }
+    ];
+    
+    
+    $(document).on('cityIdGot',function () {    
+        tableIndex.bootstrapTable({columns:columns});
+        queryBaseConfig();
+    });
+
+    layer.config({extend: 'extend/layer.ext.js'}); 
+    
+    searchIndex.on('click',function() {    	
+    	
+    	 if($("#market_name_percent").val() == ''){
+             layer.msg('市场名称不能为空');
+             return;
+         } 
+    	 if($("#market_name_percent").val().length > 10){
+             layer.msg('市场名称不能超过50个汉字或字符');
+             return;
+         }     
+    	 $.ajax({
+             type: "POST",
+             url: '/research/baseconfig/insertResearchMarketBaseConfig',
+             contentType: 'application/json;charset=UTF-8',
+             dataType:"json",
+             data:JSON.stringify({
+            	 marketName:$.trim($("#market_name_percent").val()),            	
+            	 dataType:2,
+            	 markupPercentageDouble:0
+             }),             
+             success: function(datas){
+                 if (datas.data == 1) {
+                     layer.alert('保存成功.');
+                     queryBaseConfig(); 
+                 }else if (datas.data == 0) {
+                     layer.alert('市场已存在.');
+                     queryBaseConfig(); 
+                 } else {
+                     layer.msg('操作失败',{icon:5});
+                     queryBaseConfig();
+                 }
+
+             },
+             dataType: 'json'
+         });      
+
+			})
+       tableIndex.on('click','.js_delete',function(){
+    	var _thisTr = $(this).closest('tr');
+        var row = JSON.parse(_thisTr.find('.row').val());
+        var ops = opsParam(row);
+        
+        
+        $.ajax({
+            type: "POST",
+            url: '/research/baseconfig/deleteResearchMarketBaseConfig',
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            data:JSON.stringify(ops),           
+            success: function(datas){
+                if (datas.data == 1) {
+                    layer.alert('删除成功.');
+                    queryBaseConfig();
+                } else {
+                    layer.msg('操作失败',{icon:5});
+                    queryBaseConfig();
+                }
+
+            },
+            dataType: 'json'
+        });    
+     
+    });
+    function opsParam(row) {
+    	var ops = new Object();     	
+    	ops.id = row.id;    	
+    	return ops;
+    }
+   function queryBaseConfig(){  
+            tableIndex.bootstrapTable('destroy').bootstrapTable({
+                columns: columns,
+                uniqueId: 'id',
+                url: '/research/baseconfig/getResearchMarketBaseConfig',
+                queryParamsType: '',
+                pagination: true,
+                sidePagination: 'server',
+                method: 'post',
+                pageSize: 40,
+                pageList: [20, 40, 60, 80],
+                paginationPreText: "上一页",
+                paginationNextText: "下一页",
+                paginationFirstText: "首页",
+                paginationLastText: "尾页",
+                queryParams: queryParams,
+                responseHandler: function (res) {
+                    if (res.data) {
+                    	return res.data
+                    } else {
+                    	return [];
+                    }
+                }
+            })
+            theadOnTop(tableIndex);       
+    };
+    function queryParams(params) {
+        params.dataType = 2;        
+        return params;
+    }
+    
+    searchType.on('change', function(){
+        var typeClass = '.type-' + $(this).find(':selected').data('type');
+        $(this).parent().siblings('.type').hide().siblings(typeClass).show();
+    });
+
+
+})();
+</script>

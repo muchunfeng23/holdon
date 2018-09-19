@@ -1,0 +1,91 @@
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="author" content="" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+
+    <script type="text/javascript" src="/assets/js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/assets/js/select2.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap-table-zh-CN.min.js"></script>
+    <script type="text/javascript" src="/assets/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/assets/js/laydate/laydate.js"></script>
+    <script type="text/javascript" src="/assets/js/mrm/common.js"></script>
+    <script type="text/javascript" src="/assets/js/mrm/fileupload.js"></script>
+    <script type="text/javascript" src="/assets/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.webui-popover.min.js"></script>
+    <script type="text/javascript" src="/assets/js/only-run-java.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-table.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/select2.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/viewer.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/jquery.webui-popover.min.css"/>
+    
+    <script th:inline="text">
+    	var springProfiles = "[[${springProfiles}]]";
+    </script>
+    
+    <script>
+    	var isOnlyRunJava = false;
+    	var publicServerDomain = "price.yunshanmeicai.com";
+
+        if(parent.window.frames.length>0){
+          
+        }else{
+            isOnlyRunJava = true;
+        }        
+    	    	
+    	if(springProfiles=="test"){
+    		publicServerDomain = "price.test.yunshanmeicai.com";
+    	}else if(springProfiles=="test2"){
+            publicServerDomain = "price.test2.yunshanmeicai.com";
+        }else if(springProfiles=="stage"){
+    		publicServerDomain = "price.stage.yunshanmeicai.com";
+    	}else{
+    		publicServerDomain = "price.yunshanmeicai.com";
+    	}   	
+    	var publicServerUrlPrefix = location.protocol + "//" + publicServerDomain ; 
+    </script>
+
+    <script>
+        $(function () {
+
+            menuList = [
+                {name: '市调首页',url: '/priceresearch/market/index.mc'},
+                {name: '市调配置',url: '/priceresearch/market/set.mc'}
+            ];
+
+            onlyRunJava(isOnlyRunJava);
+            postMsg();
+            window.addEventListener('message', function (e) {
+                if (e.data.middle)
+                    $('nav').hide();
+                if (e.data.header_city_id) {
+                    $('#header_city_id').val(e.data.header_city_id);
+                    $(document).trigger('cityIdGot');
+                }
+            })
+            //取消 input 的autocomplete
+            $('input:not([autocomplete]), textarea:not([autocomplete]), select:not([autocomplete])').attr('autocomplete', 'off');
+        });
+
+        function postMsg(config) {
+            var d = {
+                code: 0,
+                height: $("#inIframe").height(),
+                target: 'innerIframe'
+            };
+            parent.postMessage($.extend({}, d, config || {}), '*');
+        }
+        
+        function makeUpPublicUrl(url){
+        	return publicServerUrlPrefix + url;
+        }
+        	
+    </script>
+</head>

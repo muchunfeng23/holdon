@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c %M:%L - %m%n</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="ACCESS"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %c %M:%L - %m%n</Pattern>
+		</layout>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>
+				${LOG_PATH}/price_research-web.log.%d{yyyy-MM-dd}.zip
+			</FileNamePattern>
+			<MaxHistory>90</MaxHistory>
+		</rollingPolicy>
+<!-- 
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>100MB</MaxFileSize>
+		</triggeringPolicy>
+-->		
+	</appender>
+	
+	<logger name="com.sprucetec.hawkeye" level="ERROR" />
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="ACCESS" />
+	</root>
+</configuration>

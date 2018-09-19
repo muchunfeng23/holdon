@@ -1,0 +1,72 @@
+server:
+  port: 9999
+  
+meicai:
+  system:
+    key: pspmc
+  auth:
+    server: http://192.168.254.19:10001
+    timeout: 10
+    sso_domain: http://sso.test.yunshanmeicai.com
+    token_name: test_user_token
+    sso_cookie_domain: test.yunshanmeicai.com
+    is_native: false
+    login_url: /user/login?system_key=
+    logout_url: /site/logout?system_key=
+    check_acess_url: /adminuser/checkaccess
+    getallaccess_url: /role/listaccessbytokenandkey
+    switchcity_url: /adminuser/switchcity
+    excludePath: /static/**,/assets/**,/error,/noLogin,/noPermission,/techops/**,/noPermissionCityPartner
+  rpc:
+    server:
+      auth: http://192.168.254.19:10001
+      class: http://192.168.254.65:3000
+      gis: http://192.168.254.22:8001
+      
+      
+retail_price:
+  dubbo:
+    producer:
+      group: 
+        price_index: priceIndex
+        cache: cacheService
+        city_partner: cityPartner
+      
+
+spring:
+  profiles : test
+  jmx:
+    enabled: false
+  velocity:
+    charset: UTF-8
+    properties:
+      input:
+        encoding: UTF-8
+      output:
+        encoding: UTF-8
+    resource-loader-path: classpath:/templates/
+    suffix: .html
+  resources:
+    static-locations: classpath:/static/
+     
+dubbo:
+  application:
+    name: retail_price
+    environment: test
+  registry:
+    protocol: zookeeper
+    address: 192.168.2.18:2181
+  publish:
+    port: 13261
+
+logging:
+  path: /data/retail_price/retail_price-web/logs
+  config: classpath:config/logback.xml
+  level:
+    root: info
+    ACCESS: info
+
+redis:
+  topic: message_persistence
+
+ 

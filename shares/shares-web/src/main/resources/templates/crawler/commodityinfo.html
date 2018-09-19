@@ -1,0 +1,166 @@
+<div class="modal fade" id="modal-profit-info" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" style="width: 1000px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 id="modalTitle" class="modal-title">竞品信息详情</h4>
+			</div>
+			<div class="modal-body">
+				<section class="search-body">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">基本信息</h3>
+						</div>
+						<!-- 商品信息表 -->
+						<table id="modal-table1"></table>
+					</div>
+				</section>
+				<section>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">价格</h3>
+						</div>
+
+						<div class="panel-body">
+							<form role="form" id="search_form" class="form">
+								<div class="form-group mc-form-group">
+									<input id="goodsId" class="form-control" type="hidden"/>
+									
+									<label class="control-label" style="margin-left: -50px">爬取日期:</label>
+									<input id="start_date1" type="text" class="form-control" name="start_date" onclick="laydate()" placeholder="开始日期" autocomplete="off" readonly style="background-color:#fff;width:200px">
+									<label class="control-label" style="text-align: center !important;">至</label>
+									<input id="end_date1" type="text" class="form-control" name="end_date" onclick="laydate()" placeholder="结束日期" autocomplete="off" readonly style="background-color:#fff;width:200px">
+								</div>
+								<div class="form-group mc-form-group">
+									<label class="control-label" style="margin-left: -50px">城市:</label>
+									<select class="form-control" id="select-city1" name="select-city" style="width:200px"></select>
+								</div>
+								<div class="form-group mc-form-group">
+									<button id="searchIndex1" type="button" class="btn btn-sch btn-primary">查询</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</section>
+				<!-- echarts -->
+				<section>
+					<div id="charts" style="min-height:400px;margin:0 auto"></div>
+				</section>
+				<!-- 价格表格 -->
+				<section>
+					<table id="modal-table2"></table>
+				</section>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default modal-btn-close" data-dismiss="modal" aria-label="Close">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function(){
+        laydate($.extend({},defaultDateOpts,{elem: '#start_date1',max:laydate.now(0)}));
+        laydate($.extend({},defaultDateOpts,{elem: '#end_date1',max:laydate.now(0)}));
+
+	
+	    $.ajax({
+        	headers: {header_city_id: $('#header_city_id').val()},
+            method : 'post',
+            url :'/priceresearch/public/getAllCity',
+            xhrFields:{
+                withCredentials:true
+            },
+            contentType : 'application/json',
+            data : {},
+            dataType : 'json',
+            success : function(json) {
+                var option = '';
+                if (json.error_code == 0 && json.data) {
+                    for (var i = 0, len = json.data.length; i < len; i++) {
+                        option += '<option value="'+json.data[i].id+'">'
+                            + json.data[i].short_name + '</option>';
+                    }
+                }
+
+            }
+        })
+
+	});
+
+    var modalTable1 = $("#modal-table1");
+    var modalTable2 = $("#modal-table2");
+	var startDate1 = $("#start_date1");
+	var endDate1 = $("#end_date1");
+	var searchIndex1 = $("#searchIndex1");
+	var defaultDateOpts = {elem: '#id', format: 'YYYY-MM-DD', isclear: true, issure: true};
+	var arrColumns1=[
+	    			{
+	    				field: 'id',
+	    			    title: '爬虫商品ID',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    field: 'name',
+	    			    title: '商品名称',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    field: 'description',
+	    			    title: '商品描述',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    field: 'price',
+	    			    title: '价格',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    field: 'unit',
+	    			    title: '单位',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    field: 'source',
+	    			    title: '来源平台',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    field: 'cityName',
+	    			    title: '城市',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    field: 'dt',
+	    			    title: '爬取时间',
+	    			    align: 'center'
+	    			},
+	    			{
+	    			    title: '网址',
+	    			    align: 'center',
+	    		    	formatter: function(v,row){
+	    		    		if(row.pictureUrl==''){
+	    		    			return `来源网页`
+	    		    		}
+	    	                return `<a class="profit-info-view2" href="${row.pictureUrl}" target="_blank">来源网页</a>`
+	    	            }
+	    			}];
+	var arrColumns2=[{
+	    field: 'cityName',
+	    title: '城市',
+	    align: 'center'
+	},{
+	    field: 'ctStr',
+	    title: '日期',
+	    align: 'center'
+	},{
+	    field: 'price',
+	    title: '价格',
+	    align: 'center'
+	}];
+	
+	searchIndex1.on('click',function(){initPageChart()});
+	
+
+</script>
+</html>

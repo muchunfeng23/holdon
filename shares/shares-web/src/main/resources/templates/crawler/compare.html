@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="author" content="" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <script type="text/javascript" src="/assets/js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/assets/js/select2.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap-table.min.js"></script>
+    <script type="text/javascript" src="/assets/js/bootstrap-table-zh-CN.min.js"></script>
+    <script type="text/javascript" src="/assets/js/layer/layer.js"></script>
+    <script type="text/javascript" src="/assets/js/laydate/laydate.js"></script>
+    <script type="text/javascript" src="/assets/js/mrm/common.js"></script>
+    <script type="text/javascript" src="/assets/js/mrm/fileupload.js"></script>
+    <script type="text/javascript" src="/assets/js/echarts.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.webui-popover.min.js"></script>
+    <script type="text/javascript" src="/assets/js/only-run-java.js"></script>
+	
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-table.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/select2.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/viewer.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/assets/css/jquery.webui-popover.min.css"/>
+<title></title>
+<style type="text/css">
+	.mc-form-group .btn {width: inherit;margin-left:0}
+	.control-label{text-align:right !important;}
+	.form-control{
+		width: 200px !important;}
+</style>
+</head>
+<body>
+	<div th:replace="include/common"></div>
+	<div class="wrap">
+		<div class="main">
+			<!-- 搜索区域 -->
+			<section>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form role="form" id="search_form" class="form">
+							<div class="form-group mc-form-group">
+								<label class="control-label">城市:</label>
+								<select class="form-control" id="city" name="select-city"></select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">售卖区:</label>
+								<select class="form-control" id="areaId" name="select-area">
+									<option value="">全部</option>
+								</select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">一级分类:</label>
+								<select class="form-control" id="class1"></select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">二级分类:</label>
+								<select class="form-control" id="class2"></select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">名称:</label>
+								<input id="name" type="text" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">SKU-ID:</label>
+								<input id="skuId" type="text" class="form-control" />
+							</div>
+							<div class="form-group mc-form-group" style="">
+								<label class="control-label">SSU-ID:</label>
+								<input id="ssuId" type="text" class="form-control" />
+	                        </div>
+	                        <div class="form-group mc-form-group" style="">
+	                            <label class="control-label" style="text-align:right">时间:</label>
+	                            <input id="start_date" type="text" class="form-control" name="start_date" onclick="laydate()" placeholder="开始日期" autocomplete="off" readonly style="background-color:#fff">
+	                            <label class="control-label" style="text-align: center !important;">至</label>
+	                            <input id="end_date" type="text" class="form-control" name="end_date" onclick="laydate()" placeholder="结束日期" autocomplete="off" readonly style="background-color:#fff">
+	                        </div>
+	                        <div class="form-group mc-form-group">
+	                        	<label class="control-label">价格比较:</label>
+	                        	<select id="compare" name="compare" class="form-control">
+									<option selected="selected" value="">全部</option>
+									<option value="0">优势</option>
+									<option value="1">持平</option>
+									<option value="2">劣势</option>
+									<option value="3">未匹配</option>
+								</select>
+	                        </div>
+	                        <div class="form-group mc-form-group">
+	                            <button id="searchIndex" type="button" class="btn btn-sch btn-primary">查询</button>
+	                        </div>
+	                        <div class="form-group mc-form-group">
+	                            <button id="downloadIndex" type="button" class="btn btn-sch1 btn-primary" style="display: none">导出</button>
+	                        </div>
+						</form>
+					</div>
+				</div>
+			</section>
+			<!-- table -->
+			<section>
+				<table id="tableIndex" data-toolbar="#toolbar"></table>
+			</section>
+		</div>
+	</div>
+	<form action="/research/crawlercompare/download" method="post" id=download class="hidden">
+	    <input type="text" name="city">
+	    <input type="text" name="class1">
+	    <input type="text" name="class2">
+	    <input type="text" name="name">
+	    <input type="text" name="skuid">
+	    <input type="text" name="ssuid">
+	    <input type="text" name="compare">
+	    <input type="text" name="startDateStr">
+	    <input type="text" name="endDateStr">
+	</form> 
+</body>
+
+<!-- Modal Set Start -->
+<div th:replace="crawler/skuinfo"></div>
+<div th:replace="crawler/matching"></div>
+<!-- Modal Set End -->
+
+<script type="text/javascript">
+	$(function(){
+		laydate($.extend({},defaultDateOpts,{elem: '#start_date',max:laydate.now(0)}));
+	    laydate($.extend({},defaultDateOpts,{elem: '#end_date',max:laydate.now(0)}));
+	
+	    startDate.val(laydate.now(0));
+	    endDate.val(laydate.now(0));
+	    
+		tableIndex.bootstrapTable({columns:arrColumns});
+		
+		$.ajax({
+        	headers: {header_city_id: $('#header_city_id').val()},
+            method : 'post',
+            url :'/priceresearch/public/getAllCity',
+            xhrFields:{
+                withCredentials:true
+            },
+            contentType : 'application/json',
+            data : {},
+            dataType : 'json',
+            success : function(json) {
+                var option = '';
+                option += '<option value="">' + '全部' + '</option>';
+                if (json.error_code == 0 && json.data) {
+                    for (var i = 0, len = json.data.length; i < len; i++) {
+                        option += '<option value="'+json.data[i].id+'">'
+                            + json.data[i].short_name + '</option>';
+                    }
+                }
+                $("#city").html(option).on('change',function () {
+                	var cityId = $(this).val();
+                    var areaSelectHead = '<option value="">全部</option>';
+                    var areaSelect = $("#areaId").append(areaSelectHead);
+                    var cityId = $(this).val();
+                    if (cityId == "") {
+                        areaSelect.html(areaSelectHead);
+                    }else {
+                        $.ajax({
+                            method:'post',
+                            url:'/priceresearch/public/getSaleAreaByCity',
+                            xhrFields:{
+                                withCredentials:true
+                            },
+                            data:{cityId: cityId},
+                            dataType:'json',
+                            success:function(json){
+                                if(json.error_code == 0){
+                                    var str = areaSelectHead;
+                                    $.each(json.data,function(i,item){
+                                        str += "<option value=" + item.id + ">" + item.name + "</option>";
+                                    });
+                                } else {
+                                    layer.alert(json.message || '操作失败。');
+                                }
+                                areaSelect.html(str);
+                            }
+                        });
+					}
+                });
+            }
+        });
+        
+        loadClass();
+	});
+
+	var defaultDateOpts = {elem: '#id', format: 'YYYY-MM-DD', isclear: true, issure: true};
+	var tableIndex = $("#tableIndex");
+	var searchIndex = $("#searchIndex");
+	var downloadIndex =$("#downloadIndex");
+	var startDate = $("#start_date");
+	var endDate = $("#end_date");
+    var profitInfo = $("#modal-profit-info");
+    var profitInfo1 = $("#modal-profit-info1");
+	var arrColumns= [{
+		
+	    title: 'SKU-ID',
+	    align: 'center',
+	    formatter: function(v,row){
+            return `<a class="profit-info-view" data-info="${row.skuId}" target="_blank" style="cursor:pointer">${row.skuId}</a>`
+        }
+	},{
+		field: 'ssuId',
+	    title: 'SSU-ID',
+	    align: 'center'
+	},{
+		field: 'ssuName',
+	    title: '商品名称',
+	    align: 'center'
+	},{
+		field: 'ssuFormat',
+	    title: '规格',
+	    align: 'center'
+	},{
+		field: 'ssuUnit',
+	    title: '计价单位',
+	    align: 'center'
+	},{
+		field: 'areaName',
+	    title: '区域',
+	    align: 'center'
+	},{
+	    title: '自营零售价',
+	    align: 'center',
+	    formatter: function(v,row){
+	    	return `<lable style="color:#00CD00;font-weight:bold" >${row.price}</lable>`
+	    }
+	},{
+		field: 'proPriceRange',
+	    title: '自营促销价',
+	    align: 'center'
+	},{
+	    title: '竞品价格',
+	    align: 'center',
+	    formatter: function(v,row){
+	    	var html = "";
+	    	if(row.infoList == null || row.infoList.length == 0){
+	    		return `-`;
+	    	}else{
+	    		for(var i = 0;i < row.infoList.length;i++){
+	    		    if (row.price > row.infoList[i].crawlerPrice){
+                        html += '<p title="' + row.infoList[i].description + '">' + '<label style="font-weight:bold;">[' + row.infoList[i].format + ']</label>' + '<label style="color:red"> ' + row.infoList[i].crawlerPrice + '</label>' + '元,(' + row.infoList[i].source + '_' + row.infoList[i].businessId + ')' + row.infoList[i].dtStr + '</P>';
+					}else {
+                        html += '<p title="' + row.infoList[i].description + '">' + '<label style="font-weight:bold;">[' + row.infoList[i].format + ']</label>' + row.infoList[i].crawlerPrice + '元,(' + row.infoList[i].source + '_' + row.infoList[i].businessId + ')' + row.infoList[i].dtStr + '</P>';
+					}
+	    		}
+	    		return html;
+	    	}
+        }
+	},{
+	    title: '竞品转换价格',
+	    align: 'center',
+	    formatter:function(v,row){
+	    	var html = "";
+	    	if(row.infoList == null || row.infoList.length == 0){
+	    		return `-`;
+	    	}else{
+	    		for(var i = 0;i < row.infoList.length;i++){
+	    		    if (row.price > (row.infoList[i].crawlerPrice * row.infoList[i].conversionFactor / 1000)){
+	    		    	var num1 = row.infoList[i].crawlerPrice * row.infoList[i].conversionFactor / 1000;
+                        html += '<p>' + '<label style="color:red"> ' + (num1.toFixed(2)) + '</label>' + '元' + '</P>';
+					}else {
+						var num2 = row.infoList[i].crawlerPrice * row.infoList[i].conversionFactor / 1000;
+                        html += '<p>' + (num2.toFixed(2)) + '元' + '</P>';
+					}
+	    		}
+	    		return html;
+	    	}
+	    }
+	},{
+		field: 'rate',
+	    title: '最低价差价率',
+	    align: 'center'
+	},{
+	    title: '操作',
+	    align: 'center',
+    	formatter: function(v,row){
+               return `<a class="profit-info-view1" data-info="${row.skuId},${row.ssuId},${row.cityId}" target="_blank" style="cursor:pointer">匹配竞品</a>`
+           }
+	}];
+	
+	// 一级分类
+    function loadClass() {
+        var cls1option = '<option value="">请选择一级分类</option>';
+        var cls2option = '<option value="">请选择二级分类</option>';
+        var cls3option = '<option value="">请选择三级分类</option>';
+        var cls1 = $("#class1").append(cls1option);
+        var cls2 = $("#class2").append(cls2option);
+        var cls3 = $("#class3").append(cls3option);
+        $.ajax({
+            method : 'post',
+            url :'/priceresearch/public/getClass1',
+            xhrFields:{
+                withCredentials:true
+            },
+            contentType : 'application/json',
+            data : {},
+            dataType : 'json',
+            success : function(json) {
+                if (json.error_code == 0) {
+                    var str = cls1option;
+                    $.each(json.data, function(i, item) {
+                        str += "<option value=" + item.id + ">"
+                            + item.name + "</option>";
+                    });
+                    cls1.html(str).on('change', function() {
+                        if (cls1.find(':selected').val() == '') {
+                            cls2.html(cls2option).val('');
+                        } else {
+                            getClass2(cls1.val());
+                        }
+                        cls3.html(cls3option).val('');
+                    });
+                } else {
+                    layer.alert(json.message || '操作失败。');
+                }
+            }
+        });
+
+
+        function getClass2(id){
+            $.ajax({
+                method : 'post',
+                url :'/priceresearch/public/getChildClass',
+                xhrFields:{
+                    withCredentials:true
+                },
+                contentType : 'application/json',
+                data : JSON.stringify({
+                    parentId : id
+                }),
+                dataType : 'json',
+                success : function(json) {
+                    if (json.error_code == 0) {
+                        var str = cls2option;
+                        $.each(json.data, function(i, item) {
+                            str += "<option value=" + item.id + ">"
+                                + item.name + "</option>";
+                        });
+                        cls2.html(str).on('change', function() {
+                            if (cls2.find(':selected').val() == '') {
+                                cls3.html(cls3option).val('');
+                            } else {
+                                getClass3(cls2.val());
+                            }
+                        });
+                    } else {
+                        layer.alert(json.message || '操作失败。');
+                    }
+                }
+            });
+        }
+
+        function getClass3(id){
+            $.ajax({
+                method : 'post',
+                url :'/priceresearch/public/getChildClass',
+                xhrFields:{
+                    withCredentials:true
+                },
+                contentType : 'application/json',
+                data : JSON.stringify({
+                    parentId : id
+                }),
+                dataType : 'json',
+                success : function(json) {
+                    if (json.error_code == 0) {
+                        var str = cls3option;
+                        $.each(json.data, function(i, item) {
+                            str += "<option value=" + item.id + ">"
+                                + item.name + "</option>";
+                        });
+                        cls3.html(str);
+                    } else {
+                        layer.alert(json.message || '操作失败。');
+                    }
+                }
+            });
+        }
+    }
+	
+    searchIndex.on('click',function(){initPage()});
+    
+    downloadIndex.on('click',function(){
+    	
+    	if($("#skuId").val()=='' && $("#ssuId").val()=='' && $("#name").val()==''){
+			if($("#class1").val()==''){
+				layer.msg('请选择一级分类');
+	        	return;
+			}
+		}
+        if(isNaN($("#skuId").val())){
+        	layer.msg('请输入正确的SKU-ID');
+        	return;
+        }
+        if(isNaN($("#ssuId").val())){
+        	layer.msg('请输入正确的SSU-ID');
+        	return;
+        }
+        
+        $("input[name='city']").val($("#city option:selected").val());
+        
+        $("input[name='class1']").val($("#class1").val());
+
+        $("input[name='class2']").val($("#class2").val());
+
+        $("input[name='name']").val($("#name").val());
+
+        $("input[name='skuid']").val($("#skuId").val());
+
+        $("input[name='ssuid']").val($("#ssuId").val());
+
+        $("input[name='compare']").val($("#compare option:selected").val());
+
+        $("input[name='startDateStr']").val(startDate.val());
+
+        $("input[name='endDateStr']").val(endDate.val());
+        
+        $("#download").submit();
+
+	})
+    
+	function initPage(obj){
+    	if(new Date($("#start_date").val()) > new Date($("#end_date").val())){
+            layer.msg('时间区间不正确');
+            return;
+        }
+        if ($("#city").val()==''){
+    	    layer.msg('请选择城市');
+    	    return;
+		}
+		if($("#skuId").val()=='' && $("#ssuId").val()=='' && $("#name").val()==''){
+			if($("#class1").val()==''){
+				layer.msg('请选择一级分类');
+	        	return;
+			}
+		}
+        if(isNaN($("#skuId").val())){
+        	layer.msg('请输入正确的SKU-ID');
+        	return;
+        }
+        if(isNaN($("#ssuId").val())){
+        	layer.msg('请输入正确的SSU-ID');
+        	return;
+        }
+        tableIndex.bootstrapTable('destroy').bootstrapTable({
+            columns:arrColumns,
+            showRefresh:true,
+            uniqueId:'id',
+            url:'/research/crawlercompare/getCompareByParamsInPage',
+            queryParamsType:'',
+            pagination:true,
+            sidePagination: 'server',
+            method:'post',
+            pageSize:40,
+            pageList: [20,40,60,80],
+            paginationPreText: "上一页",
+            paginationNextText: "下一页",
+            paginationFirstText: "首页",
+            paginationLastText: "尾页",
+            queryParams:function (params) {
+                params.city = $("#city option:selected").val();
+                params.class1 = $("#class1").val();
+                params.class2 = $("#class2").val();
+                params.name = $("#name").val();
+                params.skuid = $("#skuId").val();
+                params.ssuid = $("#ssuId").val();
+                params.compare = $("#compare option:selected").val();
+                params.startDateStr = startDate.val();
+                params.endDateStr = endDate.val();
+                params.areaId = $("#areaId").val();
+                return params;
+            },
+            responseHandler:function(res){
+            	if(res.data){
+                    return res.data
+                }else{
+                    return [];
+                }
+            }
+        });
+        
+    }
+
+    tableIndex.on('click', '.profit-info-view', function() {
+        var dataInfo = $(this).data('info');
+
+
+        $.ajax({
+            method : 'post',
+            url :'/research/crawlercompare/getSkuInfo',
+            xhrFields:{
+                withCredentials:true
+            },
+            contentType : 'application/json',
+            data : JSON.stringify({skuid:dataInfo}),
+            dataType : 'json',
+            success : function(json) {
+                if(json.data){
+                    console.log(json.data.data[0]);
+                    var sku=json.data.data[0];
+                    var statusStr="有效";
+                    if(sku.status==0){
+                        statusStr="无效";
+                    }
+
+                    $("#skuId1").val(sku.id);
+                    $("#sku_name").val(sku.sku_name);
+                    $("#international_code").val(sku.international_code);
+                    $("#status").val(statusStr);
+                    $("#class1-1").val(sku.class1_name);
+                    $("#class2-1").val(sku.class2_name);
+                    $("#class3").val(sku.class3_name);
+                    $("#article_name").val(sku.article_name);
+                    $("#sbu_code").val(sku.sbu_code);
+                    $("#sbu_name").val(sku.sbu_name);
+                    $("#own_brand").val(sku.own_brand);
+                    $("#manufacturer").val(sku.manufacturer);
+                    $("#origin_country_name").val(sku.origin_country_name);
+                    $("#origin_region").val(sku.origin_region);
+                    profitInfo.modal('show');
+				}else {
+                    $("#skuId1").val();
+                    $("#sku_name").val();
+                    $("#international_code").val();
+                    $("#status").val();
+                    $("#class1-1").val();
+                    $("#class2-1").val();
+                    $("#class3").val();
+                    $("#article_name").val();
+                    $("#sbu_code").val();
+                    $("#sbu_name").val();
+                    $("#own_brand").val();
+                    $("#manufacturer").val();
+                    $("#origin_country_name").val();
+                    $("#origin_region").val();
+                    profitInfo.modal('show');
+				}
+
+            }
+        })
+    });
+
+    tableIndex.on('click', '.profit-info-view1', function() {
+    	$("#modal-dialog1").show();
+		$("#modal-dialog2").hide();
+        var dataInfo = $(this).data('info').split(',');
+
+		document.getElementById("select-sourse1").value = "";
+		document.getElementById("name1").value = "";
+		document.getElementById("search").className="active";
+		document.getElementById("machine").className="";
+		document.getElementById("home").className="tab-pane fade in active panel-body";
+		document.getElementById("auto").className="tab-pane fade";
+		
+		$("#hideSku").val(dataInfo[0]);
+		$("#hideSsu").val(dataInfo[1]);
+		$("#hideCity").val(dataInfo[2]);
+		
+		tableIndex3.bootstrapTable('destroy').bootstrapTable({
+            columns:arrColumns3,
+            responseHandler:[]
+		});
+        tableIndex1.bootstrapTable('destroy').bootstrapTable({
+            columns: arrColumns1,
+            showRefresh: false,
+            uniqueId: 'id',
+            url: '/research/crawlermatch/getSkuInfo',
+            queryParamsType: '',
+            pagination: false,
+            sidePagination: 'server',
+            method: 'post',
+            queryParams: function (params) {
+            	params.skuId = dataInfo[0];
+                params.ssuId = dataInfo[1];
+                params.cityId = dataInfo[2];
+                return params;
+            },
+            responseHandler: function (res) {
+                if (res.data) {
+                    return res.data
+                } else {
+                    return [];
+                }
+            }
+        });
+
+        tableIndex2.bootstrapTable('destroy').bootstrapTable({
+            columns:arrColumns2,
+            showRefresh:false,
+            uniqueId:'id',
+            url:'/research/crawlermatch/getCrawlerMatched',
+            queryParamsType:'',
+            pagination:false,
+            sidePagination: 'server',
+            method:'post',
+
+            queryParams: function (params) {
+            	params.skuId = dataInfo[0];
+                params.id = dataInfo[1];
+                params.cityId = dataInfo[2];
+                return params;
+            },
+            responseHandler:function(res){
+                if(res.data){
+                    return res.data
+                }else{
+                    return [];
+                }
+            }
+        });
+
+        tableIndex4.bootstrapTable('destroy').bootstrapTable({
+            columns:arrColumns3,
+            showRefresh:false,
+            uniqueId:'id',
+            url:'/research/crawlermatch/getMachineMatching',
+            queryParamsType:'',
+            pagination:true,
+            sidePagination: 'server',
+            method:'post',
+            pageSize:5,
+            pageList: [5,10,15,20],
+            paginationPreText: "上一页",
+            paginationNextText: "下一页",
+            paginationFirstText: "首页",
+            paginationLastText: "尾页",
+            queryParams: function (params) {
+            	params.skuId = dataInfo[0];
+                params.id = dataInfo[1];
+                params.cityId = dataInfo[2];
+                return params;
+            },
+            responseHandler:function(res){
+                if(res.data){
+                    profitInfo1.modal('show');
+                    return res.data;
+
+                }else{
+                    profitInfo1.modal('show');
+                    return [];
+                }
+            }
+        });
+    });
+    
+
+</script>
+</html>

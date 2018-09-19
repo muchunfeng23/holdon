@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="include/head"></head>
+<body>
+	<div th:replace="include/common"></div>
+
+	<style media="screen">
+.opts {
+	margin: 0 6px;
+	cursor: pointer;
+}
+
+.opts_disagree {
+	color: red
+}
+
+.btn-sch {
+	background-color: #4ec7ff;
+	color: #fff
+}
+
+.apart {
+	background: rgba(129, 214, 247, 0.12)
+}
+
+.form-group .control-label {
+	text-align: right;
+}
+
+.form-group.mc-form-group .input-group {
+	width: 90px !important;
+}
+
+.input80 {
+	width: 80px !important;
+	z-index: 0 !important;
+}
+
+.mc-form-group .btn {
+	width: inherit;
+	margin-left: 0
+}
+
+.row {
+	display: flex;
+	align-items: center;
+}
+
+<
+style media ="screen ">.opts {
+	margin: 0 6px;
+	cursor: pointer;
+}
+
+.opts_disagree {
+	color: red
+}
+
+.btn-sch {
+	background-color: #4ec7ff;
+	color: #fff
+}
+
+.ssuinfo {
+	color: rgb(0, 102, 255)
+}
+
+.outer-table .pop-table {
+	position: fixed;
+	display: none
+}
+
+.pop-table {
+	margin-bottom: 3px !important
+}
+
+.pop-table tr td:nth-of-type(odd) {
+	background-color: #f3f2f2;
+	color: #000;
+}
+
+.mc-form-group .btn {
+	width: inherit;
+	margin-left: 0
+}
+
+<
+style>.category {
+	margin-right: 20px;
+	width: 200px !important;
+}
+
+input[readonly] {
+	background: #fff !important;
+	width: 144px !important;
+}
+
+select.form-control {
+	width: 120px !important;
+}
+
+.detail-view thead {
+	background: #e8e8e8;
+}
+
+.form .form-group, .form .checkbox-inline {
+	margin: 0 0 20px 20px;
+}
+
+</style>
+<div class="wrap">
+	<div class="main">
+		<section id="ui-search-area">
+			<div class="panel panel-default">
+			
+				<div class="panel-body">
+					<form role="form" class="form form-inline">
+						<div class="form-group type type-class">
+						<label class="control-label">批发市场</label>
+						<select class="form-control" id="market_select"></select>
+						<label class="control-label">商品</label> 
+						<input class="form-control" id="skuId"></input>
+						</div>
+						<div class="form-group">
+							<button id="search-index" type="button" class="btn btn-info" style="margin-left: 20px">查询</button>
+							<button id="add-index" type="button" class="btn btn-info">新增加价率</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+		<!-- table -->
+		<section>
+			<table id="table-index"></table>
+		</section>
+	</div>
+</div>
+<div class="modal fade" id="modal-profit-info1" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" id="modal-dialog1" style="width: 400px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
+				 <h4 id="modalTitle" class="modal-title">新增加价率</h4>
+			</div>
+			<div class="modal-body">
+				<section>
+					<div>
+						<!-- 商品信息表 -->
+						<div>
+							<label>加价率:</label>
+							<input id="addRatio" type="text"/>
+						</div>
+					</div>
+				</section>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default modal-btn-ok" id="addRatioOk">确定</button>
+				<button type="button" class="btn btn-default modal-btn-close" data-dismiss="modal" aria-label="Close">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+	<script type="text/javascript">
+(function(){
+	
+    var tableIndex = $("#table-index");
+    var searchIndex = $("#search-index");
+    var addIndex = $("#add-index");
+    var market_select = $("#market_select");
+    var addRatioOk = $("#addRatioOk");
+    var columns = [
+    	{
+            field: 'marketName',
+            title: '市场',
+            align: 'center'
+        },{
+            field: 'class1Name',
+            title: '一级分类',
+            align: 'center'
+        }, {
+            field: 'class2Name',
+            title: '二级分类',
+            align: 'center'
+        }, {
+            field: 'skuId',
+            title: 'SKU-ID',
+            align: 'center'
+        }, {
+            field: 'skuName',
+            title: '商品名称',
+            align: 'center'
+        }, {
+            field: 'addRatio',
+            title: '加价率',
+            align: 'center'
+        }, {
+            title: '操作',
+            align: 'center',
+            formatter: function (value, row) {
+            	//var html = "<a class='js_modify'  href='javascript:void(0)' title='修改'>修改</a>"; 
+            	//html += " | "
+                var html = "<a class='js_delete'  href='javascript:void(0)' title='删除'>删除</a>";             
+                html += "<input type='hidden' class='row' value='"+JSON.stringify(row)+"'>";
+                return html;
+            }
+        }
+    ];
+    
+    function opsParam(row) {
+    	var ops = new Object();     	
+    	ops.id = row.id;    	
+    	return ops;
+    }
+    tableIndex.on('click','.js_delete',function(){
+    	var lineContent = $(this);
+    	layer.msg("确定要删除么?",{
+    		time:0,
+    		btn:['确认','取消'],
+    		yes:function(index){
+    			layer.close(index);
+    			var _thisTr = lineContent.closest('tr');
+    	        var row = JSON.parse(_thisTr.find('.row').val());
+    	        var ops = opsParam(row);
+    	        $.ajax({
+    	            type: "POST",
+    	            url: '/research/researchconfig/deleteResearchMarketWhitelistConfig',
+    	            contentType: 'application/json;charset=UTF-8',
+    	            dataType:"json",
+    	            data:JSON.stringify(ops),           
+    	            success: function(datas){
+    	                if (datas.error_code == 0) {
+    	                    layer.alert('删除成功.');
+    	                    queryBaseConfig();
+    	                } else {
+    	                    layer.msg('操作失败',{icon:5});
+    	                    queryBaseConfig();
+    	                }
+
+    	            },
+    	            dataType: 'json'
+    	        });
+    		}
+    	});
+    });
+    function queryBaseConfig(){  
+    	$.ajax({
+        	method : 'post',
+			url: "/research/researchconfig/getResearchMarketWhitelistConfig",
+			contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            data:JSON.stringify({
+            	marketId:$("#market_select option:selected").val(),
+            	skuId:$("#skuId").val()
+            }),             
+			success : function(json) {
+				if (json.error_code == 0) {
+					tableIndex.bootstrapTable('load',json.data);
+				} else {
+					layer.alert(json.message || '操作失败。');
+				}
+        	}
+        });
+        theadOnTop(tableIndex); 
+	};
+        
+    tableIndex.on('click','.js_modify',function(){
+    	
+    });
+    $(document).on('cityIdGot',function () {
+    	initClass();
+    	initMarket();
+    	tableIndex.bootstrapTable({columns:columns});
+    });
+    layer.config({extend: 'extend/layer.ext.js'});
+   	
+    addRatioOk.on('click',function(){
+    	//提交加价率
+    	if(isEmpty($("#market_select").val())){
+            layer.msg('请选择市场名称');
+            return;
+        }
+    	if($("#addRatio").val() == "" || !$("#addRatio").val().match(/^\d+\.?\d{0,2}$/)){
+	   		 layer.msg('请重新输入加价率');
+	         return;
+	   	}
+    	if( $("#addRatio").val() < 0 || $("#addRatio").val() > 50){
+	   		 layer.msg('加价率必须大于等于0且小于等于50');
+	            return;
+	   	}
+    	$("#modal-profit-info1").modal('hide');
+    	$.ajax({
+            type: "POST",
+            url: '/research/researchconfig/addResearchMarketWhitelistConfig',
+            contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            data:JSON.stringify({
+            	marketId:$("#market_select option:selected").val(),
+            	marketName:$("#market_select option:selected").text(),
+           		skuId:$("#skuId").val(),
+           		addRatio:$("#addRatio").val()
+            }),             
+            success: function(datas){
+            	if(datas.error_code == 0){
+            		layer.alert('保存成功.');
+            		queryBaseConfig();
+            	}else{
+            		layer.alert(datas.error.msg);
+            	}
+            },
+            dataType: 'json'
+        }); 
+    });
+    addIndex.on('click',function(){
+    	if(isEmpty($("#skuId").val())){
+    		 layer.msg('请填写skuId');
+             return;
+    	}
+    	$("#modal-profit-info1").modal('show');
+    });
+    searchIndex.on('click',function() {
+    	if(isEmpty($("#market_select").val())){
+            layer.msg('请选择市场名称');
+            return;
+        }
+    	$.ajax({
+        	method : 'post',
+			url: "/research/researchconfig/getResearchMarketWhitelistConfig",
+			contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            data:JSON.stringify({
+            	marketId:$("#market_select option:selected").val(),
+            	skuId:$("#skuId").val()
+            }),             
+			success : function(json) {
+				if (json.error_code == 0) {
+					tableIndex.bootstrapTable('load',json.data);
+				} else {
+					layer.alert(json.message || '操作失败。');
+				}
+        	}
+        });
+        theadOnTop(tableIndex);  
+    });
+    
+    //查询市场
+    function initMarket(){
+    	var marketOption = '<option value="">请选择市场名称</option>';
+    	var markets = $("#market_select").append(marketOption);
+    	$.ajax({
+        	method : 'post',
+			url: "/research/baseconfig/getResearchMarketBaseConfig",
+			contentType: 'application/json;charset=UTF-8',
+            dataType:"json",
+            data:JSON.stringify({
+            	dataType:1
+            }),             
+			success : function(json) {
+				if (json.error_code == 0) {
+					var str = markets;
+					$.each(json.data.rows, function(i, item) {
+						str += "<option value=" + item.id + ">" + item.name
+								+ "</option>";
+					});
+					$("#market_select").html(str)
+				} else {
+					layer.alert(json.message || '操作失败。');
+				}
+        	}
+        });
+    }
+    
+    function isEmpty(aValue){
+    	if(aValue == '' || aValue == null){
+            return true;
+        }
+    	return false;
+    }
+    
+    // 一级分类
+	function initClass() {
+		var cls1option = '<option value="">请选择一级分类</option>';
+		var cls2option = '<option value="">请选择二级分类</option>';
+		var cls3option = '<option value="">请选择三级分类</option>';
+		var cls1 = $("#class1_select").append(cls1option);
+		var cls2 = $("#class2_select").append(cls2option);
+        var cls3 = $("#class3_select").append(cls3option);
+        $.ajax({
+			//headers: {header_city_id: $('#header_city_id').val()},
+			method : 'post',
+			url :makeUpPublicUrl('/retailprice/public/getClass1'),
+            xhrFields:{
+	           withCredentials:true
+            },      
+			//url : '/pricemonitor/public/getClass1',
+			//contentType : 'application/json',
+			data : {},
+			dataType : 'json',
+			success : function(json) {
+				if (json.error_code == 0) {
+					var str = cls1option;
+					$.each(json.data, function(i, item) {
+						str += "<option value=" + item.id + ">" + item.name
+								+ "</option>";
+					});
+					cls1.html(str).on('change', function() {
+						if (cls1.find(':selected').val() == '') {
+							cls2.html(cls2option).val('');
+						} else {
+							getClass2(cls1.val());
+						}
+						cls3.html(cls3option).val('');
+					});
+				} else {
+					layer.alert(json.message || '操作失败。');
+				}
+        	}
+    	});
+
+
+	    function getClass2(id){
+	        $.ajax({
+				//headers: {header_city_id: $('#header_city_id').val()},
+				method : 'post',
+				url :makeUpPublicUrl('/retailprice/public/getChildClassPublic'),
+	            xhrFields:{
+	                withCredentials:true
+	            },        
+				//url : '/pricemonitor/public/getChildClass',
+				//contentType : 'application/json',
+				data : {
+					parentId : id
+				},
+				dataType : 'json',
+				success : function(json) {
+					if (json.error_code == 0) {
+						var str = cls2option;
+						$.each(json.data, function(i, item) {
+							str += "<option value=" + item.id + ">"
+									+ item.name + "</option>";
+						});
+						cls2.html(str).on('change', function() {
+							if (cls2.find(':selected').val() == '') {
+								cls3.html(cls3option).val('');
+							} else {
+								//getClass3(cls2.val());
+							}
+						});
+					} else {
+						layer.alert(json.message || '操作失败。');
+					}
+				}
+	        });
+	    }
+
+	   function getClass3(id){
+	       $.ajax({
+			//headers: {header_city_id: $('#header_city_id').val()},
+			method : 'post',
+			url :makeUpPublicUrl('/retailprice/public/getChildClassPublic'),
+	           xhrFields:{
+	               withCredentials:true
+	           },        
+			//url : '/pricemonitor/public/getChildClass',
+			//contentType : 'application/json',
+			data : {
+				parentId : id
+			},
+			dataType : 'json',
+			success : function(json) {
+				if (json.error_code == 0) {
+					var str = cls3option;
+					$.each(json.data, function(i, item) {
+						str += "<option value=" + item.id + ">"
+								+ item.name + "</option>";
+					});
+					cls3.html(str);
+				} else {
+					layer.alert(json.message || '操作失败。');
+				}
+			}
+			});
+		}
+	} 
+})();
+
+
+</script>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="include/head"></head>
+<body>
+	<div th:replace="include/common"></div>
+
+	<style media="screen">
+.opts {
+	margin: 0 6px;
+	cursor: pointer;
+}
+
+.opts_disagree {
+	color: red
+}
+
+.btn-sch {
+	background-color: #4ec7ff;
+	color: #fff
+}
+
+.apart {
+	background: rgba(129, 214, 247, 0.12)
+}
+
+.form-group .control-label {
+	text-align: right;
+}
+
+.form-group.mc-form-group .input-group {
+	width: 90px !important;
+}
+
+.input80 {
+	width: 80px !important;
+	z-index: 0 !important;
+}
+
+.mc-form-group .btn {
+	width: inherit;
+	margin-left: 0
+}
+
+.row {
+	display: flex;
+	align-items: center;
+}
+
+<
+style media ="screen ">.opts {
+	margin: 0 6px;
+	cursor: pointer;
+}
+
+.opts_disagree {
+	color: red
+}
+
+.btn-sch {
+	background-color: #4ec7ff;
+	color: #fff
+}
+
+.ssuinfo {
+	color: rgb(0, 102, 255)
+}
+
+.outer-table .pop-table {
+	position: fixed;
+	display: none
+}
+
+.pop-table {
+	margin-bottom: 3px !important
+}
+
+.pop-table tr td:nth-of-type(odd) {
+	background-color: #f3f2f2;
+	color: #000;
+}
+
+.mc-form-group .btn {
+	width: inherit;
+	margin-left: 0
+}
+</style>
+	<div class="wrap">
+		<div class="main">
+			<!-- 搜索区域 -->
+			<section>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<form role="form" id="search_form" class="form">
+
+							<div class="form-group mc-form-group">
+								<select class="form-control" name="select-search-type"
+									id="select-search-type">
+									<option value="3" data-type="class">商品类别</option>
+									<option value="1" data-type="sku">SKU-ID</option>
+								</select>
+							</div>
+							<div class="form-group mc-form-group type type-class">
+								<label class="control-label">一级分类</label> <select
+									class="form-control" id="class1_select"></select>
+							</div>
+							<div class="form-group mc-form-group type type-sku"
+								style="display: none;">
+								<label class="sr-only"></label> <input type="text"
+									class="form-control" id="f_sku" placeholder="请输入SKU-ID"
+									autocomplete="off">
+							</div>
+
+							<div class="form-group mc-form-group" style="">
+								<label class="control-label" style="text-align: right">录入时间</label>
+								<input id="start_date" type="text" class="form-control"
+									name="start_date" placeholder="开始日期" autocomplete="off"
+									readonly style="width: 180px; background-color: #fff">
+								<label class="control-label" style="text-align: center">至</label>
+								<input id="end_date" type="text" class="form-control"
+									name="end_date" placeholder="结束日期" autocomplete="off" readonly
+									style="width: 180px; background-color: #fff">
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">市调员</label> <select
+									class="form-control" name="research_user" id="research_user">
+									<option value="" data-type="class">全部</option>
+								</select>
+							</div>
+							<div class="form-group mc-form-group">
+								<label class="control-label">售卖市场</label> <select
+									class="form-control" name="market" id="market">
+									<option value="" data-type="class">全部</option>
+								</select>
+							</div>
+								<div class="form-group mc-form-group">
+								<label class="control-label">任务状态</label> <select
+									class="form-control" name="task_status" id="task_status">									
+									<option value="1">已调</option>
+									<option value="2">未调</option>									
+								</select>
+							</div>
+							<div class="form-group mc-form-group">
+								<button id="searchIndex" type="button" class="btn btn-sch">查询</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</section>
+			<!-- Table -->
+			<section id="">
+				<table id="tableIndex" data-toolbar="#toolbar"></table>
+			</section>
+		</div>
+	</div>
+
+	<script>
+		$(function() {
+			laydate($.extend({}, defaultDateOpts, {
+				elem : '#start_date',
+				max : laydate.now(0)
+			}));
+			laydate($.extend({}, defaultDateOpts, {
+				elem : '#end_date',
+				max : laydate.now(0)
+			}));
+
+			startDate.val(laydate.now(0));
+			endDate.val(laydate.now(0));
+
+			tableIndex.bootstrapTable({
+				columns : arrColumns
+			});
+			$('.no-records-found').empty();
+
+			$(document).on('cityIdGot', function() {
+				initClass();
+				initMarket();
+				initUserInfo();
+			});
+		});
+		var defaultDateOpts = {
+			elem : '#id',
+			format : 'YYYY-MM-DD',
+			isclear : true,
+			issure : true
+		};
+		var tableIndex = $("#tableIndex");
+		var searchIndex = $("#searchIndex");
+		var startDate = $("#start_date");
+		var endDate = $("#end_date");
+		var searchType = $("#select-search-type");
+		var arrColumns = [ {
+			field : 'class1Name',
+			title : '一级分类',
+			align : 'center'
+		}, {
+			field : 'articleName',
+			title : '通用名',
+			align : 'center'
+		}, {
+			field : 'skuId',
+			title : 'SKU-ID',
+			align : 'center'
+		}, {
+			field : 'skuName',
+			title : 'SKU名称',
+			align : 'center'
+		}, {
+			field : 'skuFormat',
+			title : '规格',
+			align : 'center'
+
+		}, {
+			field : 'unitName',
+			title : '计价单位',
+			align : 'center'
+
+		}, {
+			field : 'marketName',
+			title : '批发市场',
+			align : 'center'
+
+		}, {
+			field : 'priceDouble',
+			title : '当时售价',
+			align : 'center',
+			formatter : function(v, row) {
+				var priceDouble = row.priceDouble;
+				
+				switch (priceDouble) {
+				case -1:
+					priceDouble = '-';
+					break;						
+				}
+				return priceDouble;
+			}
+
+		}, {
+			field : 'researchPriceDouble',
+			title : '市调售价',
+			align : 'center'
+
+		}, {
+			field : 'userName',
+			title : '录入人员',
+			align : 'center'
+
+		}, {
+			field : 'uTStr',
+			title : '录入时间',
+			align : 'center'
+
+		}, {
+            field : 'dataDate',
+            title : '任务日期',
+            align : 'center'
+
+        }, {
+			field : 'taskStatus',
+			title : '任务状态',
+			align : 'center',
+            formatter : function(v, row) {
+				var taskStatus = row.taskStatus;
+				var str = '-';
+				switch (taskStatus) {
+				case 1:
+					str = '已调';
+					break;
+				case 2:
+					str = '未调';
+					break;				
+				}
+				return str;
+			}
+
+		} ];
+		searchIndex.on('click', function() {
+			initPage()
+		});
+		function initPage(obj) {
+			if (new Date($("#start_date").val()) > new Date($("#end_date")
+					.val())) {
+				layer.msg('时间区间不正确');
+				return;
+			}
+			if (!$("#f_sku").val().match(/^[0-9]*$/) && $("#f_sku").val() != "") {
+				layer.msg('sku-id必须为数字');
+				return;
+			}
+			tableIndex.bootstrapTable('destroy').bootstrapTable({
+				columns : arrColumns,
+				showRefresh : true,
+				uniqueId : 'id',
+				url : '/research/markettaskrecord/getResearchMarketTaskRecord',
+				queryParamsType : '',
+				pagination : true,
+				sidePagination : 'server',
+				method : 'post',
+				pageSize : 40,
+				pageList : [ 20, 40, 60, 80 ],
+				paginationPreText : "上一页",
+				paginationNextText : "下一页",
+				paginationFirstText : "首页",
+				paginationLastText : "尾页",
+				queryParams : function(params) {
+					params.skuId = $("#f_sku").val();
+					params.class1Id = $("#class1_select").val();
+					params.userId = $("#research_user").val();
+					params.marketId = $("#market").val();
+					params.taskStatus = $("#task_status").val();
+					params.endDateStr = endDate.val();
+					params.startDateStr = startDate.val();
+					params.dataType = 2;
+					params.userType='web';
+					return params;
+				},
+				responseHandler : function(res) {
+					if (res.data) {
+						return res.data
+					} else {
+						return [];
+					}
+				}
+			});
+			theadOnTop(tableIndex);
+		}
+
+		//o={class_info:row.class_info,area_name:row.area_name,sku_id:row.sku_id,sku_name:row.sku_name,ssu_id:row.ssu_id,format:row.format};
+		function createPopTable(data) {
+			var html = '';
+			html += '<table class="pop-table table table-bordered">';
+			html += '<tr><td>分类信息</td><td>' + data.class_info
+					+ '</td><td>售卖区</td><td>' + data.area_name + '</td></tr>';
+			html += '<tr><td>SKUID</td><td>' + data.sku_id
+					+ '</td><td>SKU名称</td><td>' + data.sku_name + '</td></tr>';
+			html += '<tr><td>SSUID</td><td>' + data.ssu_id
+					+ '</td><td>SSU信息</td><td>' + data.format
+					+ '</td></tr></table>';
+			return html;
+		}
+		searchType.on('change', function() {
+			var typeClass = '.type-' + $(this).find(':selected').data('type');
+			$(this).parent().siblings('.type').hide().siblings(typeClass)
+					.show();
+			if (typeClass == '.type-class') {
+				$("#f_sku, #f_ssu").val('');
+			} else if (typeClass == '.type-ssu') {
+				$("#f_sku, #class1_select, #class2_select").val('');
+			} else {
+				$("#f_ssu, #class1_select, #class2_select").val('');
+			}
+		});
+		tableIndex.on('load-success.bs.table', function() {
+			var opts = {
+				trigger : 'click',
+				placement : 'bottom',
+				width : '600',
+				arrow : false,
+				padding : true,
+				content : '',
+				closeable : false
+			};
+			$('.ssuinfo').hover(function() {
+				var poptable = $(this).next('.outer-table').html();
+				$(this).webuiPopover($.extend({}, opts, {
+					content : poptable
+				})).trigger('click');
+			}, function() {
+				$(this).trigger('click');
+			});
+		});
+
+		function initMarket() {
+			$
+					.ajax({
+						method : 'post',
+						url : '/research/baseconfig/getResearchMarketBaseConfig',
+						contentType : 'application/json',
+						data : JSON.stringify({
+							dataType : 2
+						}),
+						dataType : 'json',
+						success : function(json) {
+							var option = '';
+							option += '<option value="">' + '全部' + '</option>';
+							if (json.error_code == 0 && json.data) {
+								for (var i = 0, len = json.data.total; i < len; i++) {
+									option += '<option value="'+json.data.rows[i].id+'">'
+											+ json.data.rows[i].name
+											+ '</option>';
+								}
+								$("#market").html(option).trigger('change');
+							}
+						}
+					})
+		}
+		
+		function initUserInfo() {
+			$
+					.ajax({
+						method : 'post',
+						url : '/research/markettaskrecord/getResearchMarketTaskRecordUserListInfo',
+						contentType : 'application/json',
+						data : JSON.stringify({
+							dataType : 2
+						}),
+						dataType : 'json',
+						success : function(json) {
+							var option = '';
+							option += '<option value="">' + '全部' + '</option>';
+							if (json.error_code == 0 && json.data) {
+								for (var i = 0, len = json.data.length; i < len; i++) {
+									option += '<option value="'+json.data[i].userId+'">'
+											+ json.data[i].userName
+											+ '</option>';
+								}
+								$("#research_user").html(option).trigger('change');
+							}
+						}
+					})
+		}
+
+		// 一级分类
+		function initClass() {
+			var cls1option = '<option value="">请选择一级分类</option>';
+			var cls2option = '<option value="">请选择二级分类</option>';
+			var cls3option = '<option value="">请选择三级分类</option>';
+			var cls1 = $("#class1_select").append(cls1option);
+			var cls2 = $("#class2_select").append(cls2option);
+			var cls3 = $("#class3_select").append(cls3option);
+			$.ajax({
+				//            headers: {header_city_id: $('#header_city_id').val()},
+				method : 'post',
+				url : makeUpPublicUrl('/retailprice/public/getClass1'),
+				xhrFields : {
+					withCredentials : true
+				},
+				//url : '/pricemonitor/public/getClass1',
+				//contentType : 'application/json',
+				data : {},
+				dataType : 'json',
+				success : function(json) {
+					if (json.error_code == 0) {
+						var str = cls1option;
+						$.each(json.data, function(i, item) {
+							str += "<option value=" + item.id + ">" + item.name
+									+ "</option>";
+						});
+						cls1.html(str).on('change', function() {
+							if (cls1.find(':selected').val() == '') {
+								cls2.html(cls2option).val('');
+							} else {
+								//getClass2(cls1.val());
+							}
+							cls3.html(cls3option).val('');
+						});
+					} else {
+						layer.alert(json.message || '操作失败。');
+					}
+				}
+			});
+
+			function getClass2(id) {
+				$
+						.ajax({
+							//                headers: {header_city_id: $('#header_city_id').val()},
+							method : 'post',
+							url : makeUpPublicUrl('/retailprice/public/getChildClassPublic'),
+							xhrFields : {
+								withCredentials : true
+							},
+							//url : '/pricemonitor/public/getChildClass',
+							//contentType : 'application/json',
+							data : {
+								parentId : id
+							},
+							dataType : 'json',
+							success : function(json) {
+								if (json.error_code == 0) {
+									var str = cls2option;
+									$.each(json.data, function(i, item) {
+										str += "<option value=" + item.id + ">"
+												+ item.name + "</option>";
+									});
+									cls2.html(str).on(
+											'change',
+											function() {
+												if (cls2.find(':selected')
+														.val() == '') {
+													cls3.html(cls3option).val(
+															'');
+												} else {
+													getClass3(cls2.val());
+												}
+											});
+								} else {
+									layer.alert(json.message || '操作失败。');
+								}
+							}
+						});
+			}
+
+			function getClass3(id) {
+				$
+						.ajax({
+							//                headers: {header_city_id: $('#header_city_id').val()},
+							method : 'post',
+							url : makeUpPublicUrl('/retailprice/public/getChildClassPublic'),
+							xhrFields : {
+								withCredentials : true
+							},
+							//url : '/pricemonitor/public/getChildClass',
+							//contentType : 'application/json',
+							data : {
+								parentId : id
+							},
+							dataType : 'json',
+							success : function(json) {
+								if (json.error_code == 0) {
+									var str = cls3option;
+									$.each(json.data, function(i, item) {
+										str += "<option value=" + item.id + ">"
+												+ item.name + "</option>";
+									});
+									cls3.html(str);
+								} else {
+									layer.alert(json.message || '操作失败。');
+								}
+							}
+						});
+			}
+		}
+	</script>
