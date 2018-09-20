@@ -53,5 +53,5 @@
 		interface="com.sprucetec.price.research.crawler.api.CrawlerCompareApi"
 		group="priceResearchCompareInfo2"
 		check="false" timeout="20000" retries="0" />
-
+		
 </beans>
