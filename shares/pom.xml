@@ -25,7 +25,7 @@
 		<module>shares-db</module>
 		<module>shares-main</module>
 		<module>shares-redis</module>
-  </modules>
+	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
